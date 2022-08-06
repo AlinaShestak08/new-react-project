@@ -22,7 +22,7 @@ import {
 } from '../../../core/slices/postsSlice';
 import { IPost, IPostsInfo } from '../../../types/posts';
 import { Input } from '../../atoms/Input';
-import { Modal } from '../../templates/Modal/Modal';
+import { PostCard, Tabs, Modal } from '../../examples';
 
 // interface IPost {
 //   author: number;
@@ -61,31 +61,7 @@ export const PostsPage = () => {
 
   useEffect(() => {
     dispatch(getPostsAsync({ searchValue, orderingValue }) as any);
-    // fetch(
-    //   `https://studapi.teachmeskills.by/blog/posts/?limit=20&search=${searchValue}&ordering=${orderingValue}`,
-    // )
-    //   .then((response) => {
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     console.log(data);
-    //     setPosts(data);
-    //     // setPostsV2(data);
-    //   });
   }, [searchValue, orderingValue, dispatch]);
-
-  // useEffect(() => {
-  //   console.log('useEffect 2');
-  //   if (searchValue.length) {
-  //     const newPosts = posts?.results.filter(
-  //       (post: IPost) => post.title.indexOf('searchValue') !== -1,
-  //     );
-  //     // const newPosts = posts?.results.reduce((acc, ))
-  //     if (newPosts) {
-  //       setPostsV2({ ...posts, results: newPosts } as IPostsInfo);
-  //     }
-  //   }
-  // }, [posts, searchValue]);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>, field: string) => {
     dispatch(setSearchValue(event.target.value));
@@ -144,58 +120,28 @@ export const PostsPage = () => {
   };
 
   return (
-    // <FormTemplate title="Sign in">
     <>
-      Edit mode: {isEditMode ? 'On' : 'Off'}
-      <button onClick={() => dispatch(setIsEditMode(!isEditMode))}>Toggle edit mode</button>
-      <button onClick={sendPosts}>Send posts(Redux)</button>
-      <button onClick={() => dispatch(setIsShowModalPostsList(true))}>Show posts(Modal)</button>
-      {postsLocal?.map(({ id }) => (
-        <Li key={id}>{id}</Li>
-      ))}
-      <button onClick={() => dispatch(removePosts())}>Clear posts</button>
-      Posts:
-      <TabsOrdering>
-        {fields.map(({ fieldName, name }) => (
-          <Li key={fieldName} onClick={() => onChangeOrdering(fieldName)}>
-            {name}
-          </Li>
-        ))}
-      </TabsOrdering>
-      <Input
-        {...searchInput}
-        onChange={(event) => onChange(event, 'searchValue')}
-        onBlur={onBlur}
+      <Tabs
+        link1Text="All"
+        url1="/posts"
+        link2Text="My favorites"
+        url2="/posts"
+        link3Text="Popular"
+        url3="/posts"
       />
-      <List>
+      <br></br>
+      <br></br>
+      <AllPosts>
         {posts?.results?.map(
-          ({ date, title, id, lesson_num, author, isFavorite, likes, dislikes, ...res }) => (
-            <LiPost key={id}>
-              id: {id} - title: {title}
-              <button onClick={() => dispatch(likePost(id))}>Like: {likes}</button>
-              <button onClick={() => dispatch(dislikePost(id))}>Dislike: {dislikes}</button>
-              <button
-                onClick={() =>
-                  onSelectPostLocal({
-                    date,
-                    title,
-                    id,
-                    lesson_num,
-                    author,
-                    isFavorite,
-                    likes,
-                    dislikes,
-                    ...res,
-                  })
-                }>
-                Select local posts
-              </button>
-              <button
-                onClick={() =>
+          ({ date, title, id, image, lesson_num, author, isFavorite, likes, dislikes, ...res }) => (
+            <PostCard
+              onClick={
+                () =>
                   onSelectPost({
                     date,
                     title,
                     id,
+                    image,
                     lesson_num,
                     author,
                     isFavorite,
@@ -203,36 +149,35 @@ export const PostsPage = () => {
                     dislikes,
                     ...res,
                   })
-                }>
-                Select post(1)
-              </button>
-              <div>
-                <button onClick={() => dispatch(toggleFavorite(id))}>
-                  {isFavorite ? 'Remove' : 'Add'}
-                </button>
-                <p>Favorite: {isFavorite ? 'yes' : 'no'}</p>
-              </div>
-              date: {date} - title: {title} - lesson_num: {lesson_num} - author: {author}
-            </LiPost>
+                //onSelectPost({ date, title, id, image, author, lesson_num, text, ...res })
+              }
+              key={id}
+              date={date}
+              id={id}
+              title={title}
+              image={image}
+            />
+            // <PostCard key={id}>
+            //     <PostImg onClick={() => setShowModal(true)} src={image}></PostImg>
+            //     <PostDate>{date}</PostDate>
+            //     <PostTitle href={"/posts/" + `${id}`} > {title} </PostTitle>
+            //     <PostButtons>
+            //       <div>
+            //         <LikeButton onClick={() => console.log("like")}/>
+            //         <DislikeButton onClick={() => console.log("dislike")}/>
+            //       </div>
+            //       <FavoriteButton onClick={() => console.log("favorite")}/>
+            //     </PostButtons>
+            // </PostCard>
           ),
         )}
-      </List>
+      </AllPosts>
       {isShowModalPost && (
         <Modal onClose={() => dispatch(setIsShowModalPost(false))}>
           {selectedPost?.image && <Image src={selectedPost?.image} alt="Image" />}
         </Modal>
       )}
-      {isShowModalPostsList && (
-        <Modal onClose={() => dispatch(setIsShowModalPostsList(false))}>
-          {selectedPostsList?.map(({ date, title, id, lesson_num, author, isFavorite, ...res }) => (
-            <LiPost key={id}>
-              id: {id} - title: {title}
-            </LiPost>
-          ))}
-        </Modal>
-      )}
     </>
-    // </FormTemplate>
   );
 };
 
@@ -261,6 +206,11 @@ const LiPost = styled.li`
 `;
 
 const Image = styled.img`
-  height: 100px;
-  width: 100px;
+  width: 500px;
+  max-height: 400px;
+`;
+
+const AllPosts = styled.div`
+  display: flex;
+  flex-wrap: wrap;
 `;

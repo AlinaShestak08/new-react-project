@@ -7,7 +7,7 @@ class ColorApiService {
 
   public PRIMARY = '#2231AA';
 
-  public PRIMARY_2 = '#5360CD';
+  public PRIMARY2 = '#5360CD';
 
   public SECONDARY = '#313037';
 

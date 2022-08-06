@@ -1,24 +1,17 @@
-import { ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { getFontFamily } from '../../../services';
 import { ColorService } from '../../../services/ColorService';
-// export { default as recommendPhone } from '../favoritesIcon.svg';
-import { ReactComponent as Logo } from './favoritesIcon.svg';
 
 interface IBannerJob {
   text: string;
   disabled?: boolean;
   valid?: boolean;
   onClick: () => void;
-  icon?: ReactNode;
 }
 
-export const ButtonExample = ({ text, disabled, valid, onClick, icon }: IBannerJob) => (
+export const ButtonExample = ({ text, disabled, valid, onClick }: IBannerJob) => (
   <Button onClick={onClick} disabled={disabled} valid={valid}>
-    {/* // <img src={logo} style={{ fill: '#000' }} /> */}
-    <Logo />
-    {icon}
     {text}
   </Button>
 );
@@ -35,7 +28,7 @@ const Button = styled.button<{ valid?: boolean }>`
   line-height: 29px;
   letter-spacing: 0.05em;
   color: ${(props) => (props.valid ? 'red' : 'green')};
-  font-family: ${getFontFamily()};
+  font-family: ${getFontFamily('bold')};
 
   :disabled {
     background: #ccd5dd;
@@ -43,11 +36,5 @@ const Button = styled.button<{ valid?: boolean }>`
   }
   :hover {
     background: red;
-  }
-`;
-
-const LogoStyled = styled(Logo)`
-  path {
-    fill: red;
   }
 `;
