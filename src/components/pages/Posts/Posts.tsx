@@ -19,6 +19,9 @@ import {
   dislikePost,
   setSearchValue,
   setOrderingValue,
+  setCurrentPage,
+  postsSlide,
+  setTotalCount,
 } from '../../../core/slices/postsSlice';
 import { IPost, IPostsInfo } from '../../../types/posts';
 import { Input } from '../../atoms/Input';
@@ -45,10 +48,14 @@ import { PostCard, Tabs, Modal } from '../../examples';
 export const PostsPage = () => {
   // const [sendedUser, setSendedUser] = useState(false);
 
-  const { posts, searchValue, orderingValue } = useSelector(showPosts);
+  const { posts, searchValue, orderingValue, perPage } = useSelector(showPosts);
   const isShowModalPost = useSelector(getIsShowModalPost);
   const selectedPost = useSelector(getSelectedPost);
   const { selectedPostsList, isShowModalPostsList, isEditMode } = useSelector(getSelectedPosts);
+
+  const currentPage = useSelector(setCurrentPage);
+  const totalCount = useSelector(setTotalCount);
+  const pages = [1, 2, 3, 4, 5];
   // console.log({ postsStore, selectedPostsList, isShowModalPostsList });
   const dispatch = useDispatch();
 
@@ -61,7 +68,7 @@ export const PostsPage = () => {
 
   useEffect(() => {
     dispatch(getPostsAsync({ searchValue, orderingValue }) as any);
-  }, [searchValue, orderingValue, dispatch]);
+  }, [searchValue, orderingValue, perPage, dispatch, currentPage]);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>, field: string) => {
     dispatch(setSearchValue(event.target.value));
@@ -172,6 +179,15 @@ export const PostsPage = () => {
           ),
         )}
       </AllPosts>
+
+      <Paginator>
+        {pages.map((page, index) => (
+          <PageNumber key={index} onClick={() => dispatch(currentPage(page))}>
+            {page}
+          </PageNumber>
+        ))}
+      </Paginator>
+
       {isShowModalPost && (
         <Modal onClose={() => dispatch(setIsShowModalPost(false))}>
           {selectedPost?.image && <Image src={selectedPost?.image} alt="Image" />}
@@ -213,4 +229,10 @@ const Image = styled.img`
 const AllPosts = styled.div`
   display: flex;
   flex-wrap: wrap;
+`;
+const Paginator = styled.div``;
+
+const PageNumber = styled.span`
+  margin: 0 20px;
+  cursor: pointer;
 `;
