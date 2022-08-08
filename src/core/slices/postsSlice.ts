@@ -1,7 +1,6 @@
 import { createSlice, createAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { IPostsInfo, IPost } from '../../types/posts';
-// const axios = require('axios');
 const API_URL = 'https://studapi.teachmeskills.by/blog/posts/?limit=20';
 
 interface IPostSate {
@@ -13,6 +12,9 @@ interface IPostSate {
   isEditMode: boolean;
   searchValue: string;
   orderingValue: string;
+  currentPage: number;
+  perPage: number;
+  totalCount: number;
 }
 
 const initialState: IPostSate = {
@@ -24,6 +26,9 @@ const initialState: IPostSate = {
   isEditMode: false,
   searchValue: '',
   orderingValue: '',
+  currentPage: 1,
+  perPage: 6,
+  totalCount: 0,
 };
 
 export const postsSlide = createSlice({
@@ -92,18 +97,30 @@ export const postsSlide = createSlice({
     setOrderingValue: (state, action) => {
       state.orderingValue = action.payload;
     },
-    // getTodo: (state, action) => {
-    //   state.data = [action.payload];
-    // },
+
+    setTotalCount: (state, action) => {
+      state.totalCount = action.payload;
+    },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
   },
 });
 
 export const getPostsAsync =
-  ({ searchValue, orderingValue }: { searchValue: string; orderingValue: string }) =>
+  ({
+    searchValue,
+    orderingValue,
+    perPage,
+  }: {
+    searchValue: string;
+    orderingValue: string;
+    perPage: number;
+  }) =>
   async (dispatch: any) => {
     try {
       const response = await axios.get(
-        `${API_URL}&search=${searchValue}&ordering=${orderingValue}`,
+        `${API_URL}&search=${searchValue}&ordering=${orderingValue}&offset=5=0`,
       );
       dispatch(addPosts(response.data));
     } catch (err: any) {
@@ -124,44 +141,25 @@ export const {
   dislikePost,
   setSearchValue,
   setOrderingValue,
+  setTotalCount,
 } = postsSlide.actions;
 
 export const showPosts = ({
-  posts: { posts, searchValue, orderingValue },
+  posts: { posts, searchValue, orderingValue, perPage },
 }: {
   posts: IPostSate;
-}) => ({ posts, searchValue, orderingValue });
+}) => ({ posts, searchValue, orderingValue, perPage });
 
 export const getSelectedPost = (state: { posts: IPostSate }) => state.posts.selectedPost;
 export const getIsShowModalPost = (state: { posts: IPostSate }) => state.posts.isShowModalPost;
+
+export const setCurrentPage = (state: { posts: IPostSate }) => state.posts.currentPage;
+
 // export const getSelectedPost = (state: { posts: IPostSate }) => state.posts.selectedPost;
 export const getSelectedPosts = ({ posts }: { posts: IPostSate }) => ({
   selectedPostsList: posts?.selectedPostsList,
   isShowModalPostsList: posts?.isShowModalPostsList,
   isEditMode: posts.isEditMode,
 });
-// export const showFavoritesPosts = (state: { posts: IPostSate }) =>
-//   state.posts || st.posts.filter((post: IPost) => post.isFavorite);
+
 export default postsSlide.reducer;
-
-// || st.posts.filter((post: IPost) => post.isFavorite)
-
-// export const getTodoAsync = (data) => async (dispatch) => {
-//   try {
-//     const response = await axios.get(`${API_URL}/${data}`);
-//     dispatch(getTodo(response.data));
-//   } catch (err) {
-//     throw new Error(err);
-//   }
-// };
-
-// export const addTodoAsync = (data) => async (dispatch) => {
-//   try {
-//     // console.log(data);
-//     const response = await axios.post(API_URL, data);
-//     // console.log(response);
-//     dispatch(addTodo(response.data));
-//   } catch (err) {
-//     throw new Error(err);
-//   }
-// };
